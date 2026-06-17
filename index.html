@@ -50,6 +50,7 @@
       font-size: 15px;
       cursor: pointer;
       box-shadow: 0 4px 0 #1e40af;
+      touch-action: manipulation;
     }
 
     button:hover {
@@ -114,9 +115,10 @@
       padding: 13px;
       border-radius: 10px;
       border: 2px solid #93c5fd;
-      font-size: 17px;
+      font-size: 16px;
       text-align: center;
       margin: 10px 0 15px;
+      touch-action: manipulation;
     }
 
     .choice-row {
@@ -273,19 +275,22 @@
       html,
       body {
         height: 100dvh;
+        min-height: 0;
+        max-height: 100dvh;
         overflow: hidden;
       }
 
       body {
         margin: 0;
-        padding-top: 4px;
+        padding: 4px 0;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
       }
 
       .toolbar {
-        margin: 4px 0;
+        margin: 0 0 6px;
         gap: 8px;
         flex: 0 0 auto;
       }
@@ -296,14 +301,17 @@
         box-shadow: 0 3px 0 #1e40af;
       }
 
+      /* Spielfeld nimmt nur den verbleibenden Platz – kann die Toolbar
+         dadurch nie nach oben rausdrücken. */
       .game-box {
-        height: calc(100dvh - 60px);
-        aspect-ratio: 900 / 460;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
         width: auto;
+        max-height: 100%;
         max-width: 100vw;
-        max-height: none;
-        margin: 0 auto 4px;
-        flex: 0 0 auto;
+        aspect-ratio: 900 / 460;
+        margin: 0 auto;
       }
 
       canvas {
