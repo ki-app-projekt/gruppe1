@@ -203,11 +203,76 @@
         max-width: 460px;
         margin: 10px auto;
       }
+
+      /* Auf dem Handy Überschrift + Beschreibung ausblenden, damit das
+         Spielfeld ohne Scrollen sichtbar ist. Die Regeln stehen im Startfenster. */
+      h1,
+      .info {
+        display: none;
+      }
+
+      body {
+        padding-top: 8px;
+      }
+
+      .toolbar {
+        margin: 8px 0;
+        gap: 10px;
+      }
+
+      .game-box {
+        margin-bottom: 12px;
+      }
+
+      .rules-mobile {
+        display: block;
+      }
+    }
+
+    /* Kurz-Regeln nur im Startfenster auf dem Handy. */
+    .rules-mobile {
+      display: none;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 12px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Hinweis "Bitte quer drehen" – nur auf kleinen Hochkant-Bildschirmen. */
+    #rotateNotice {
+      display: none;
+    }
+
+    @media (max-width: 950px) and (orientation: portrait) {
+      #rotateNotice {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: #111827;
+        color: #fff;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 1.6;
+      }
     }
   </style>
 </head>
 
 <body>
+  <div id="rotateNotice">
+    <div style="font-size:46px;">📱↻</div>
+    Bitte drehe dein Gerät in den Quermodus,<br />um zu spielen.
+  </div>
+
   <h1>Schul-Runner: Flucht vor dem Lehrer</h1>
 
   <p class="info">
@@ -239,6 +304,12 @@
         </div>
 
         <button id="startBtn" class="start-button">Start</button>
+
+        <p class="rules-mobile">
+          Tippe auf das Spielfeld zum Springen. 👍 grüne Handys = Punkte,
+          👎 rote Handys bringen dich näher an den Lehrer. Brot = kurz schneller,
+          Magnet zieht grüne Handys an.
+        </p>
 
         <div class="ranking">
           <h3>Rangliste</h3>
@@ -854,10 +925,8 @@
       }
     }
 
-    function update() {
-      requestAnimationFrame(update);
-
-      if (gameState === "play") {
+    // Ein fester Simulationsschritt – entspricht genau einem 60-FPS-Frame wie zuvor.
+    function simulate() {
         frame++;
 
         if (speedBoostTimer > 0) speedBoostTimer--;
@@ -1029,6 +1098,38 @@
 
         obstacles = obstacles.filter(o => o.x + o.w > -100);
         items = items.filter(i => i.x + i.w > -60 && !i.taken);
+    }
+
+    // Zeitbasierte Schleife: führt so viele feste Schritte aus, wie die real
+    // verstrichene Zeit erfordert. Dadurch läuft das Spiel auf einem langsamen
+    // Handy genauso schnell wie auf einem starken Rechner.
+    let lastTime = 0;
+    let accumulator = 0;
+    const STEP_MS = 1000 / 60;
+
+    function update(timestamp) {
+      requestAnimationFrame(update);
+
+      const now = timestamp || 0;
+      if (!lastTime) lastTime = now;
+      let elapsed = now - lastTime;
+      lastTime = now;
+
+      if (gameState === "play") {
+        if (!isFinite(elapsed) || elapsed < 0) elapsed = STEP_MS;
+        if (elapsed > 250) elapsed = 250; // nach Tab-Wechsel/Pause nicht aufholen
+
+        accumulator += elapsed;
+
+        let steps = 0;
+        while (accumulator >= STEP_MS && steps < 5) {
+          simulate();
+          accumulator -= STEP_MS;
+          steps++;
+          if (gameState !== "play") break;
+        }
+      } else {
+        accumulator = 0;
       }
 
       draw();
