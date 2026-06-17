@@ -264,6 +264,81 @@
         line-height: 1.6;
       }
     }
+
+    /* Quermodus auf dem Handy: Spielfeld nach Bildschirmhöhe skalieren,
+       damit Toolbar + Spiel ohne Scrollen auf einen Bildschirm passen. */
+    @media (max-width: 950px) and (orientation: landscape) {
+      body {
+        padding-top: 4px;
+      }
+
+      .toolbar {
+        margin: 4px 0;
+        gap: 8px;
+      }
+
+      .toolbar button {
+        padding: 6px 12px;
+        font-size: 13px;
+        box-shadow: 0 3px 0 #1e40af;
+      }
+
+      .game-box {
+        height: calc(100dvh - 56px);
+        aspect-ratio: 900 / 460;
+        width: auto;
+        max-width: 100vw;
+        max-height: none;
+        margin: 0 auto 4px;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Startfenster kompakt halten, damit nichts gescrollt werden muss. */
+      .overlay {
+        padding: 10px;
+      }
+
+      .panel {
+        padding: 14px 18px;
+        margin: 6px auto;
+        max-width: 540px;
+      }
+
+      .panel h2 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+
+      .panel input {
+        padding: 9px;
+        margin: 6px 0 10px;
+        font-size: 15px;
+      }
+
+      .choice-row {
+        margin: 8px 0 12px;
+      }
+
+      .choice {
+        padding: 9px 14px;
+      }
+
+      .start-button {
+        padding: 10px;
+      }
+
+      /* Im Querformat Regeln + Rangliste im Startfenster ausblenden,
+         um Platz zu sparen (Rangliste erscheint nach dem Spiel). */
+      .rules-mobile,
+      #startOverlay .ranking,
+      #startOverlay .small {
+        display: none;
+      }
+    }
   </style>
 </head>
 
